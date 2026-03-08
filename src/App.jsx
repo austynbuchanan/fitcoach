@@ -838,31 +838,42 @@ export default function FitCoach() {
     setAuthLoading(true); setAuthError("");
     try {
       const redirectTo = window.location.origin;
-      const fn = authMode === "signup" ? (e, p) => supabase.signUp(e, p, redirectTo) : supabase.signIn;
+      const fn = authMode === "signup" ? (em, pw) => supabase.signUp(em, pw, redirectTo) : supabase.signIn;
       const { data, error } = await fn(authEmail, authPassword);
+
       if (error) {
         const msg = error.message || error.error_description || JSON.stringify(error);
         setAuthError(msg);
         setAuthLoading(false);
         return;
       }
-      // Signup returns user but no token until email confirmed — handle gracefully
-      if (authMode === "signup" && !data.access_token) {
-        // Auto sign in immediately after signup
-        const { data: signinData, error: signinErr } = await supabase.signIn(authEmail, authPassword);
-        if (signinErr || !signinData.access_token) {
-          setAuthError("Account created! Please check your email to confirm, then sign in.");
+
+      // Try to get token — it may be at data.access_token or data.session.access_token
+      const token = data?.access_token || data?.session?.access_token;
+      const user = data?.user || data?.session?.user;
+
+      if (!token) {
+        if (authMode === "signup") {
+          // Email confirmation required — switch to sign in
+          setAuthError("Account created! Confirm your email then sign in.");
           setAuthMode("login");
-          setAuthLoading(false);
-          return;
+        } else {
+          setAuthError("Sign in failed — check your email and password.");
         }
-        const sess = { access_token: signinData.access_token, user: signinData.user };
-        setStoredSession(sess); setSession(sess);
-      } else {
-        if (!data.access_token) { setAuthError("No token received — check credentials"); setAuthLoading(false); return; }
-        const sess = { access_token: data.access_token, user: data.user };
-        setStoredSession(sess); setSession(sess);
+        setAuthLoading(false);
+        return;
       }
+
+      // Get full user if needed
+      let userId = user?.id;
+      if (!userId) {
+        const { data: userData } = await supabase.getUser(token);
+        userId = userData?.id || userData?.user?.id || "unknown";
+      }
+
+      const sess = { access_token: token, user: { id: userId, email: user?.email || authEmail } };
+      setStoredSession(sess);
+      setSession(sess);
     } catch (err) {
       setAuthError("Network error — check your connection");
     }
