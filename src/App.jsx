@@ -24,7 +24,7 @@ const supabase = (() => {
 
   return {
     // Auth
-    signUp: (email, password, redirectTo) => rpc("/auth/v1/signup", "POST", { email, password, options: { emailRedirectTo: redirectTo } }),
+    signUp: (email, password) => rpc("/auth/v1/signup", "POST", { email, password }),
     signIn: (email, password) => rpc("/auth/v1/token?grant_type=password", "POST", { email, password }),
     signOut: (token) => rpc("/auth/v1/logout", "POST", null, token),
     getUser: (token) => rpc("/auth/v1/user", "GET", null, token),
@@ -58,13 +58,10 @@ const supabase = (() => {
 })();
 
 // ── Auth state helpers ────────────────────────────────────────────────────────
-const getStoredSession = () => {
-  try { return JSON.parse(localStorage.getItem("fc_session") || "null"); } catch { return null; }
-};
-const setStoredSession = (s) => {
-  if (s) localStorage.setItem("fc_session", JSON.stringify(s));
-  else localStorage.removeItem("fc_session");
-};
+// Session stored in memory only — profile loaded from Supabase on sign in
+const getStoredSession = () => null; // no localStorage
+const setStoredSession = () => {};
+const setStoredProfile = () => {};
 
 
 function getColors(dark = true) {
@@ -806,25 +803,11 @@ export default function FitCoach() {
   const DEV_MODE = false;
   const DEV_PROFILE = { name: "Austyn", photo: null, age: "28", heightFt: "5", heightIn: "10", weight: "185", sex: "male", goal: "lose_fat", activityLevel: "moderate", coachId: "marcus", experience: "", medicalNotes: "" };
 
-  const [session, setSession] = useState(DEV_MODE ? { access_token: "dev", user: { id: "dev-user" } } : getStoredSession);
+  const [session, setSession] = useState(DEV_MODE ? { access_token: "dev", user: { id: "dev-user" } } : null);
   const [profile, setProfile] = useState(DEV_MODE ? DEV_PROFILE : null);
   const [authMode, setAuthMode] = useState("login"); // "login" | "signup"
 
-  // Handle email confirmation redirect — Supabase puts token in URL hash
-  useEffect(() => {
-    const hash = window.location.hash;
-    if (hash && hash.includes("access_token")) {
-      const params = new URLSearchParams(hash.replace("#", "?"));
-      const token = params.get("access_token");
-      const userId = params.get("user_id") || "user";
-      if (token) {
-        const sess = { access_token: token, user: { id: userId } };
-        setStoredSession(sess);
-        setSession(sess);
-        window.history.replaceState(null, "", window.location.pathname);
-      }
-    }
-  }, []);
+
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
@@ -837,52 +820,40 @@ export default function FitCoach() {
     e?.preventDefault();
     setAuthLoading(true); setAuthError("");
     try {
-      const redirectTo = window.location.origin;
-      const fn = authMode === "signup" ? (em, pw) => supabase.signUp(em, pw, redirectTo) : supabase.signIn;
-      const { data, error } = await fn(authEmail, authPassword);
+      const { data, error } = authMode === "signup"
+        ? await supabase.signUp(authEmail, authPassword)
+        : await supabase.signIn(authEmail, authPassword);
 
       if (error) {
-        const msg = error.message || error.error_description || JSON.stringify(error);
-        setAuthError(msg);
+        setAuthError(error.message || error.error_description || "Something went wrong");
         setAuthLoading(false);
         return;
       }
 
-      // Try to get token — it may be at data.access_token or data.session.access_token
       const token = data?.access_token || data?.session?.access_token;
-      const user = data?.user || data?.session?.user;
+      const user  = data?.user || data?.session?.user;
 
       if (!token) {
-        if (authMode === "signup") {
-          // Email confirmation required — switch to sign in
-          setAuthError("Account created! Confirm your email then sign in.");
-          setAuthMode("login");
-        } else {
-          setAuthError("Sign in failed — check your email and password.");
-        }
+        setAuthError("Sign in failed — please check your email and password");
         setAuthLoading(false);
         return;
       }
 
-      // Get full user if needed
-      let userId = user?.id;
-      if (!userId) {
-        const { data: userData } = await supabase.getUser(token);
-        userId = userData?.id || userData?.user?.id || "unknown";
-      }
-
-      const sess = { access_token: token, user: { id: userId, email: user?.email || authEmail } };
-      setStoredSession(sess);
+      const sess = { access_token: token, user: { id: user?.id, email: user?.email || authEmail } };
       setSession(sess);
+      // Load profile from Supabase immediately after sign in
+      const savedProfile = await supabase.load("fc_profiles", user?.id, token);
+      if (savedProfile?.data) {
+        setProfile(JSON.parse(savedProfile.data));
+      }
     } catch (err) {
-      setAuthError("Network error — check your connection");
+      setAuthError("Network error — please try again");
     }
     setAuthLoading(false);
   };
 
   const handleSignOut = () => {
     if (session?.access_token) supabase.signOut(session.access_token);
-    setStoredSession(null);
     setSession(null);
     setProfile(null);
   };
@@ -934,7 +905,7 @@ export default function FitCoach() {
     );
   }
 
-  if (!profile) return <Onboarding onComplete={(p) => setProfile(p)} />;
+  if (!profile) return <Onboarding onComplete={setProfile} />;
 
   return <App profile={profile} onProfileChange={setProfile} session={session} onSignOut={handleSignOut} syncStatus={syncStatus} setSyncStatus={setSyncStatus} />;
 }
