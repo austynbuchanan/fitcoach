@@ -596,7 +596,7 @@ function Onboarding({ onComplete }) {
       <div style={{ padding: "16px 24px 36px", flexShrink: 0 }}>
         <button onClick={next} disabled={!canNext()} style={{
           width: "100%", padding: "16px",
-          background: canNext() ? "FF5C00" : "#2a2a2e",
+          background: canNext() ? "linear-gradient(135deg,#FF9F0A,#FF5C00)" : "#2a2a2e",
           color: canNext() ? "#fff" : "#55556e",
           borderRadius: 16, fontSize: 16, fontWeight: 700,
           transition: "all .2s", border: "none",
