@@ -309,7 +309,7 @@ function Onboarding({ onComplete }) {
 
   const inputStyle = {
     width: "100%", padding: "14px 16px",
-    background: "#1a1a1f", border: "1.5px solid #1c1c2e",
+    background: "#1e1e22", border: "1.5px solid #3a3a3e",
     borderRadius: 14, color: "#F5F5F7", fontSize: 15,
     fontFamily: "inherit", outline: "none",
     transition: "border .2s",
@@ -453,7 +453,7 @@ function Onboarding({ onComplete }) {
                     <div style={{ fontWeight: 700, fontSize: 15, color: profile.goal === g.id ? "FF5C00" : "#F5F5F7" }}>{g.label}</div>
                     <div style={{ fontSize: 12, color: "#888899", marginTop: 2 }}>{g.desc}</div>
                   </div>
-                  {profile.goal === g.id && <div style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#0D0D0F", fontWeight: 800 }}>✓</div>}
+                  {profile.goal === g.id && <div style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: "#FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#fff", fontWeight: 800 }}>✓</div>}
                 </div>
               ))}
             </div>
@@ -481,7 +481,7 @@ function Onboarding({ onComplete }) {
                     <div style={{ fontWeight: 600, fontSize: 14, color: profile.activityLevel === a.id ? "FF5C00" : "#F5F5F7" }}>{a.label}</div>
                     <div style={{ fontSize: 12, color: "#888899", marginTop: 2 }}>{a.desc}</div>
                   </div>
-                  {profile.activityLevel === a.id && <div style={{ width: 20, height: 20, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#0D0D0F", fontWeight: 800 }}>✓</div>}
+                  {profile.activityLevel === a.id && <div style={{ width: 20, height: 20, borderRadius: "50%", background: "#FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#fff", fontWeight: 800 }}>✓</div>}
                 </div>
               ))}
             </div>
@@ -597,7 +597,7 @@ function Onboarding({ onComplete }) {
         <button onClick={next} disabled={!canNext()} style={{
           width: "100%", padding: "16px",
           background: canNext() ? "FF5C00" : "#2a2a2e",
-          color: canNext() ? "#0D0D0F" : "#55556e",
+          color: canNext() ? "#fff" : "#55556e",
           borderRadius: 16, fontSize: 16, fontWeight: 700,
           transition: "all .2s", border: "none",
         }}>
