@@ -24,7 +24,7 @@ const supabase = (() => {
 
   return {
     // Auth
-    signUp: (email, password) => rpc("/auth/v1/signup", "POST", { email, password }),
+    signUp: (email, password, redirectTo) => rpc("/auth/v1/signup", "POST", { email, password, options: { emailRedirectTo: redirectTo } }),
     signIn: (email, password) => rpc("/auth/v1/token?grant_type=password", "POST", { email, password }),
     signOut: (token) => rpc("/auth/v1/logout", "POST", null, token),
     getUser: (token) => rpc("/auth/v1/user", "GET", null, token),
@@ -309,8 +309,8 @@ function Onboarding({ onComplete }) {
 
   const inputStyle = {
     width: "100%", padding: "14px 16px",
-    background: "#13131f", border: "1.5px solid #1c1c2e",
-    borderRadius: 14, color: "#eeeef8", fontSize: 15,
+    background: "#1a1a1f", border: "1.5px solid #1c1c2e",
+    borderRadius: 14, color: "#F5F5F7", fontSize: 15,
     fontFamily: "inherit", outline: "none",
     transition: "border .2s",
   };
@@ -318,7 +318,7 @@ function Onboarding({ onComplete }) {
   const progress = ((step) / (TOTAL_STEPS - 1)) * 100;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#080810", color: "#eeeef8", fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column" }}>
+    <div style={{ minHeight: "100vh", background: "#0D0D0F", color: "#F5F5F7", fontFamily: "'Plus Jakarta Sans', system-ui, sans-serif", maxWidth: 430, margin: "0 auto", display: "flex", flexDirection: "column" }}>
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box;margin:0;padding:0}
@@ -330,14 +330,14 @@ function Onboarding({ onComplete }) {
       `}</style>
 
       {/* Progress bar */}
-      <div style={{ height: 3, background: "#1c1c2e", flexShrink: 0 }}>
+      <div style={{ height: 3, background: "#2a2a2e", flexShrink: 0 }}>
         <div style={{ height: "100%", background: "FF5C00", width: `${progress}%`, transition: "width .4s ease", borderRadius: 2 }} />
       </div>
 
       {/* Header */}
       <div style={{ padding: "40px 24px 0", flexShrink: 0 }}>
         {step > 0 && (
-          <button onClick={back} style={{ background: "none", color: "#55556e", fontSize: 14, fontWeight: 600, marginBottom: 20, display: "flex", alignItems: "center", gap: 6, padding: 0 }}>
+          <button onClick={back} style={{ background: "none", color: "#888899", fontSize: 14, fontWeight: 600, marginBottom: 20, display: "flex", alignItems: "center", gap: 6, padding: 0 }}>
             ← Back
           </button>
         )}
@@ -355,7 +355,7 @@ function Onboarding({ onComplete }) {
             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, fontWeight: 800, letterSpacing: -1, marginBottom: 8 }}>
               Welcome to<br /><span style={{ color: "FF5C00" }}>FitCoachAI</span> 👋
             </div>
-            <div style={{ fontSize: 14, color: "#55556e", marginBottom: 32, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 14, color: "#888899", marginBottom: 32, lineHeight: 1.6 }}>
               Let's set up your personal profile. This takes about 2 minutes.
             </div>
 
@@ -368,20 +368,20 @@ function Onboarding({ onComplete }) {
             }} style={{ display: "none" }} />
             <div style={{ display: "flex", justifyContent: "center", marginBottom: 28 }}>
               <div onClick={() => photoRef.current.click()} style={{ width: 96, height: 96, borderRadius: "50%", cursor: "pointer",
-                background: profile.photo ? "transparent" : "#13131f",
+                background: profile.photo ? "transparent" : "#1a1a1f",
                 border: "2px dashed #1c1c2e", overflow: "hidden",
                 display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 4 }}>
                 {profile.photo
                   ? <img src={profile.photo} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
                   : <>
                     <div style={{ fontSize: 28 }}>📷</div>
-                    <div style={{ fontSize: 10, color: "#55556e", fontWeight: 600 }}>Add Photo</div>
+                    <div style={{ fontSize: 10, color: "#888899", fontWeight: 600 }}>Add Photo</div>
                   </>}
               </div>
             </div>
 
             <div style={{ marginBottom: 16 }}>
-              <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>YOUR NAME</div>
+              <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>YOUR NAME</div>
               <input className="inp" value={profile.name} onChange={e => set("name", e.target.value)}
                 placeholder="First name" style={inputStyle} />
             </div>
@@ -394,27 +394,27 @@ function Onboarding({ onComplete }) {
             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: -1, marginBottom: 8 }}>
               Your Stats
             </div>
-            <div style={{ fontSize: 14, color: "#55556e", marginBottom: 28, lineHeight: 1.6 }}>
+            <div style={{ fontSize: 14, color: "#888899", marginBottom: 28, lineHeight: 1.6 }}>
               This helps us calculate your calorie targets and track your progress accurately.
             </div>
 
             <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
               <div>
-                <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>BIOLOGICAL SEX</div>
+                <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>BIOLOGICAL SEX</div>
                 <div style={{ display: "flex", gap: 10 }}>
                   {[{id:"male",label:"Male"},{id:"female",label:"Female"}].map(s => (
                     <button key={s.id} onClick={() => set("sex", s.id)}
-                      style={{ flex: 1, padding: "12px", borderRadius: 12, fontSize: 14, fontWeight: 700, border: `1.5px solid ${profile.sex === s.id ? "FF5C00" : "#1c1c2e"}`, background: profile.sex === s.id ? "FF5C0015" : "#13131f", color: profile.sex === s.id ? "FF5C00" : "#eeeef8", transition: "all .15s" }}>{s.label}</button>
+                      style={{ flex: 1, padding: "12px", borderRadius: 12, fontSize: 14, fontWeight: 700, border: `1.5px solid ${profile.sex === s.id ? "#FF5C00" : "#2a2a2e"}`, background: profile.sex === s.id ? "#FF5C0020" : "#1a1a1f", color: profile.sex === s.id ? "#FF5C00" : "#F5F5F7", transition: "all .15s" }}>{s.label}</button>
                   ))}
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>AGE</div>
+                <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>AGE</div>
                 <input className="inp" type="number" value={profile.age} onChange={e => set("age", e.target.value)}
                   placeholder="e.g. 28" style={inputStyle} />
               </div>
               <div>
-                <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>HEIGHT</div>
+                <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>HEIGHT</div>
                 <div style={{ display: "flex", gap: 10 }}>
                   <input className="inp" type="number" value={profile.heightFt} onChange={e => set("heightFt", e.target.value)}
                     placeholder="ft" style={{ ...inputStyle, flex: 1 }} />
@@ -423,7 +423,7 @@ function Onboarding({ onComplete }) {
                 </div>
               </div>
               <div>
-                <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>CURRENT WEIGHT (LBS)</div>
+                <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>CURRENT WEIGHT (LBS)</div>
                 <input className="inp" type="number" value={profile.weight} onChange={e => set("weight", e.target.value)}
                   placeholder="e.g. 185" style={inputStyle} />
               </div>
@@ -437,23 +437,23 @@ function Onboarding({ onComplete }) {
             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: -1, marginBottom: 8 }}>
               What's your goal?
             </div>
-            <div style={{ fontSize: 14, color: "#55556e", marginBottom: 28 }}>
+            <div style={{ fontSize: 14, color: "#888899", marginBottom: 28 }}>
               We'll personalize your experience around this.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
               {GOALS.map(g => (
                 <div key={g.id} onClick={() => set("goal", g.id)} style={{
                   padding: "16px 18px", borderRadius: 16, cursor: "pointer", transition: "all .2s",
-                  background: profile.goal === g.id ? "FF5C0015" : "#13131f",
-                  border: `1.5px solid ${profile.goal === g.id ? "FF5C00" : "#1c1c2e"}`,
+                  background: profile.goal === g.id ? "FF5C0015" : "#1a1a1f",
+                  border: `1.5px solid ${profile.goal === g.id ? "FF5C00" : "#2a2a2e"}`,
                   display: "flex", alignItems: "center", gap: 14,
                 }}>
                   <div style={{ fontSize: 26 }}>{g.icon}</div>
                   <div>
-                    <div style={{ fontWeight: 700, fontSize: 15, color: profile.goal === g.id ? "FF5C00" : "#eeeef8" }}>{g.label}</div>
-                    <div style={{ fontSize: 12, color: "#55556e", marginTop: 2 }}>{g.desc}</div>
+                    <div style={{ fontWeight: 700, fontSize: 15, color: profile.goal === g.id ? "FF5C00" : "#F5F5F7" }}>{g.label}</div>
+                    <div style={{ fontSize: 12, color: "#888899", marginTop: 2 }}>{g.desc}</div>
                   </div>
-                  {profile.goal === g.id && <div style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#080810", fontWeight: 800 }}>✓</div>}
+                  {profile.goal === g.id && <div style={{ marginLeft: "auto", width: 22, height: 22, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 11, color: "#0D0D0F", fontWeight: 800 }}>✓</div>}
                 </div>
               ))}
             </div>
@@ -466,31 +466,31 @@ function Onboarding({ onComplete }) {
             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: -1, marginBottom: 8 }}>
               A bit more about you
             </div>
-            <div style={{ fontSize: 14, color: "#55556e", marginBottom: 24 }}>The more we know, the better we can help.</div>
+            <div style={{ fontSize: 14, color: "#888899", marginBottom: 24 }}>The more we know, the better we can help.</div>
 
-            <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 10, letterSpacing: 0.5 }}>ACTIVITY LEVEL</div>
+            <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 10, letterSpacing: 0.5 }}>ACTIVITY LEVEL</div>
             <div style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24 }}>
               {ACTIVITY_LEVELS.map(a => (
                 <div key={a.id} onClick={() => set("activityLevel", a.id)} style={{
                   padding: "14px 16px", borderRadius: 14, cursor: "pointer", transition: "all .2s",
-                  background: profile.activityLevel === a.id ? "FF5C0015" : "#13131f",
-                  border: `1.5px solid ${profile.activityLevel === a.id ? "FF5C00" : "#1c1c2e"}`,
+                  background: profile.activityLevel === a.id ? "FF5C0015" : "#1a1a1f",
+                  border: `1.5px solid ${profile.activityLevel === a.id ? "FF5C00" : "#2a2a2e"}`,
                   display: "flex", justifyContent: "space-between", alignItems: "center",
                 }}>
                   <div>
-                    <div style={{ fontWeight: 600, fontSize: 14, color: profile.activityLevel === a.id ? "FF5C00" : "#eeeef8" }}>{a.label}</div>
-                    <div style={{ fontSize: 12, color: "#55556e", marginTop: 2 }}>{a.desc}</div>
+                    <div style={{ fontWeight: 600, fontSize: 14, color: profile.activityLevel === a.id ? "FF5C00" : "#F5F5F7" }}>{a.label}</div>
+                    <div style={{ fontSize: 12, color: "#888899", marginTop: 2 }}>{a.desc}</div>
                   </div>
-                  {profile.activityLevel === a.id && <div style={{ width: 20, height: 20, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#080810", fontWeight: 800 }}>✓</div>}
+                  {profile.activityLevel === a.id && <div style={{ width: 20, height: 20, borderRadius: "50%", background: "FF5C00", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, color: "#0D0D0F", fontWeight: 800 }}>✓</div>}
                 </div>
               ))}
             </div>
 
-            <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>TRAINING EXPERIENCE (OPTIONAL)</div>
+            <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>TRAINING EXPERIENCE (OPTIONAL)</div>
             <input className="inp" value={profile.experience} onChange={e => set("experience", e.target.value)}
               placeholder="e.g. 2 years lifting, ran a 5K last year..." style={{ ...inputStyle, marginBottom: 16 }} />
 
-            <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>ANY INJURIES OR MEDICAL NOTES (OPTIONAL)</div>
+            <div style={{ fontSize: 12, color: "#888899", fontWeight: 600, marginBottom: 8, letterSpacing: 0.5 }}>ANY INJURIES OR MEDICAL NOTES (OPTIONAL)</div>
             <textarea className="inp" value={profile.medicalNotes} onChange={e => set("medicalNotes", e.target.value)}
               placeholder="e.g. bad left knee, lower back issues..." rows={3}
               style={{ ...inputStyle, resize: "none", lineHeight: 1.5 }} />
@@ -503,7 +503,7 @@ function Onboarding({ onComplete }) {
             <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 26, fontWeight: 800, letterSpacing: -1, marginBottom: 8 }}>
               Choose your coach
             </div>
-            <div style={{ fontSize: 14, color: "#55556e", marginBottom: 24 }}>
+            <div style={{ fontSize: 14, color: "#888899", marginBottom: 24 }}>
               Pick the coaching style that resonates with you most.
             </div>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -512,8 +512,8 @@ function Onboarding({ onComplete }) {
                 return (
                   <div key={coach.id} className="coach-card" onClick={() => set("coachId", coach.id)} style={{
                     borderRadius: 18, cursor: "pointer", overflow: "hidden", transition: "all .25s",
-                    border: `2px solid ${selected ? coach.bg : "#1c1c2e"}`,
-                    background: selected ? `${coach.bg}12` : "#13131f",
+                    border: `2px solid ${selected ? coach.bg : "#2a2a2e"}`,
+                    background: selected ? `${coach.bg}12` : "#1a1a1f",
                   }}>
                     <div style={{ padding: "18px 18px 14px", display: "flex", gap: 14, alignItems: "flex-start" }}>
                       <div style={{ width: 52, height: 52, borderRadius: "50%", overflow: "hidden", border: `2px solid ${coach.bg}60`, flexShrink: 0 }}>
@@ -522,8 +522,8 @@ function Onboarding({ onComplete }) {
                       <div style={{ flex: 1 }}>
                         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
                           <div>
-                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, fontWeight: 800, color: selected ? coach.bg : "#eeeef8" }}>{coach.name}</div>
-                            <div style={{ fontSize: 11, color: "#55556e", marginTop: 1 }}>{coach.title}</div>
+                            <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 18, fontWeight: 800, color: selected ? coach.bg : "#F5F5F7" }}>{coach.name}</div>
+                            <div style={{ fontSize: 11, color: "#888899", marginTop: 1 }}>{coach.title}</div>
                           </div>
                           <div style={{ fontSize: 10, color: coach.bg, fontWeight: 700, background: `${coach.bg}18`, padding: "4px 9px", borderRadius: 20, flexShrink: 0, marginLeft: 8 }}>
                             {coach.vibe}
@@ -556,34 +556,34 @@ function Onboarding({ onComplete }) {
               <div style={{ fontFamily: "'Bebas Neue',sans-serif", fontSize: 28, fontWeight: 800, letterSpacing: -1, marginBottom: 10 }}>
                 You're all set,<br /><span style={{ color: "FF5C00" }}>{profile.name}!</span>
               </div>
-              <div style={{ fontSize: 14, color: "#55556e", marginBottom: 32, lineHeight: 1.7 }}>
+              <div style={{ fontSize: 14, color: "#888899", marginBottom: 32, lineHeight: 1.7 }}>
                 Your profile is ready. {coach?.name} is excited to start working with you.
               </div>
 
               {/* Summary card */}
-              <div style={{ background: "#13131f", border: "1px solid #1c1c2e", borderRadius: 18, padding: 20, textAlign: "left", marginBottom: 28 }}>
+              <div style={{ background: "#1a1a1f", border: "1px solid #1c1c2e", borderRadius: 18, padding: 20, textAlign: "left", marginBottom: 28 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 18, paddingBottom: 16, borderBottom: "1px solid #1c1c2e" }}>
                   {profile.photo
                     ? <img src={profile.photo} style={{ width: 52, height: 52, borderRadius: "50%", objectFit: "cover", border: "2px solid FF5C0040" }} />
                     : <div style={{ width: 52, height: 52, borderRadius: "50%", background: "FF5C0020", border: "2px solid FF5C0040", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 22 }}>👤</div>}
                   <div>
                     <div style={{ fontWeight: 700, fontSize: 17 }}>{profile.name}</div>
-                    <div style={{ fontSize: 12, color: "#55556e", marginTop: 2 }}>
+                    <div style={{ fontSize: 12, color: "#888899", marginTop: 2 }}>
                       {profile.age} yrs · {profile.heightFt}'{profile.heightIn}" · {profile.weight} lbs
                     </div>
                   </div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 10 }}>
-                  <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600 }}>Goal</div>
+                  <div style={{ fontSize: 12, color: "#888899", fontWeight: 600 }}>Goal</div>
                   <div style={{ fontSize: 13, fontWeight: 600 }}>{goal?.icon} {goal?.label}</div>
                 </div>
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-                  <div style={{ fontSize: 12, color: "#55556e", fontWeight: 600 }}>Coach</div>
+                  <div style={{ fontSize: 12, color: "#888899", fontWeight: 600 }}>Coach</div>
                   <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
                     <div style={{ width: 28, height: 28, borderRadius: "50%", overflow: "hidden", border: `2px solid ${coach?.bg}50` }}>
                       <CoachAvatar coachId={coach?.id} size={28} />
                     </div>
-                    <div style={{ fontSize: 13, fontWeight: 600 }}>{coach?.name} <span style={{ color: "#55556e", fontWeight: 400 }}>· {coach?.vibe}</span></div>
+                    <div style={{ fontSize: 13, fontWeight: 600 }}>{coach?.name} <span style={{ color: "#888899", fontWeight: 400 }}>· {coach?.vibe}</span></div>
                   </div>
                 </div>
               </div>
@@ -596,8 +596,8 @@ function Onboarding({ onComplete }) {
       <div style={{ padding: "16px 24px 36px", flexShrink: 0 }}>
         <button onClick={next} disabled={!canNext()} style={{
           width: "100%", padding: "16px",
-          background: canNext() ? "FF5C00" : "#1c1c2e",
-          color: canNext() ? "#080810" : "#55556e",
+          background: canNext() ? "FF5C00" : "#2a2a2e",
+          color: canNext() ? "#0D0D0F" : "#55556e",
           borderRadius: 16, fontSize: 16, fontWeight: 700,
           transition: "all .2s", border: "none",
         }}>
@@ -809,6 +809,22 @@ export default function FitCoach() {
   const [session, setSession] = useState(DEV_MODE ? { access_token: "dev", user: { id: "dev-user" } } : getStoredSession);
   const [profile, setProfile] = useState(DEV_MODE ? DEV_PROFILE : null);
   const [authMode, setAuthMode] = useState("login"); // "login" | "signup"
+
+  // Handle email confirmation redirect — Supabase puts token in URL hash
+  useEffect(() => {
+    const hash = window.location.hash;
+    if (hash && hash.includes("access_token")) {
+      const params = new URLSearchParams(hash.replace("#", "?"));
+      const token = params.get("access_token");
+      const userId = params.get("user_id") || "user";
+      if (token) {
+        const sess = { access_token: token, user: { id: userId } };
+        setStoredSession(sess);
+        setSession(sess);
+        window.history.replaceState(null, "", window.location.pathname);
+      }
+    }
+  }, []);
   const [authEmail, setAuthEmail] = useState("");
   const [authPassword, setAuthPassword] = useState("");
   const [authError, setAuthError] = useState("");
@@ -821,7 +837,8 @@ export default function FitCoach() {
     e?.preventDefault();
     setAuthLoading(true); setAuthError("");
     try {
-      const fn = authMode === "signup" ? supabase.signUp : supabase.signIn;
+      const redirectTo = window.location.origin;
+      const fn = authMode === "signup" ? (e, p) => supabase.signUp(e, p, redirectTo) : supabase.signIn;
       const { data, error } = await fn(authEmail, authPassword);
       if (error) {
         const msg = error.message || error.error_description || JSON.stringify(error);
